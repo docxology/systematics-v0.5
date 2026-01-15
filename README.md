@@ -1,6 +1,6 @@
 # systematics-v0.4
 
-[Interface](images/interface.png)
+![Interface](images/interface.png)
 
 ## Why
 
@@ -22,7 +22,10 @@ The backend is intended to be extensible through category theory and bootstraps 
 
 This creates a functional foundation for further bootstrapping a more complete epistemology with hermenutic consistency based on the concrete significance of number. With this backbone in place we can then begin to add new categroical schemas to the system, be those maps of mathmatical spaces or Bennetts own work categorising science, philosophy, society and cosmology - which is obviously low hanging fruit:
 
-12levelsofbeing 12levelsofenergy 12levelsofvalues 12LevelsOfSociety
+![12levelsofbeing](images/12LevelsOfBeing.png)
+![12levelsofenergy](images/12Energies.jpg)
+![12levelsofvalues](images/12values.jpg)
+![12LevelsOfSociety](images/12LevelsOfSociety.png)
 
 ## Horizon 3
 
@@ -33,8 +36,10 @@ The ability to add vocabulary and grammars in such a consistent way opens up man
 With regards to the category theoretic elements, with our bootstrapping structures in place as well as some initial well defined schemas, we can start looking at processes such as the morphisms between elements internal to a categroy, the functors between categories, or the homotopy types within and across categroies that articulate a sort of state model or hilbert space (note that each system is itself a kind of homotopy type).
 
 For example we can examine the cross category equivelence mappings between index 1, coordinate 1 and term 1, which I believe is called the functorial semantics. Or we could look at morphism types between nodes in a given category such as isomorphisms, endomorphisms, homomorphisms and so on. We can look at linear transformations such as the fibrations illustrated below where the category of sub-animate existence ‘fibrates’ into a tetrad consisting of sub categories like ‘universal field/radiation, elemental complexes, molocular structures, soil and ocean’, and the same for animate and super animate levels of existence. Or we can work out the non-linear transforms between systems such as from a monad of humanity > dyad of man/woman > the triad of father/mother/child. (Note to self this is possibly a sort of qualative fourrier transform).
+ 
+![Three Groupings of Being](images/3GroupsOfBeing.png)
+![12levelsofbeing](images/12LevelsOfBeing.png)
 
-screenshot screenshot
 
 Building this prototype so that it is self consistent and ultimately correct by construction has already presented many challenges and bootstrapping issues, but horizon one has taken shape far enough to work on the API some more while adding new features.
 Horizon omega
