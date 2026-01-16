@@ -416,13 +416,17 @@ fn add_system_links(graph: &mut Graph, order: u8) {
         }
         4 => {
             // Tetrad: Interplays between all pairs
+            // TODO: Connective assignments are currently position-based (term_4_N). Ideally,
+            // connectives should be vocabulary-coupled - if "Ideal" changes to another term,
+            // the connective mappings should update accordingly. This requires a refactor to
+            // reference terms by their character/vocabulary rather than by position.
             let interplays = [
-                ("term_4_1", "term_4_2", "receptive_regard"),
-                ("term_4_1", "term_4_3", "effectual_compatibility"),
-                ("term_4_1", "term_4_4", "motivational_imperative"),
-                ("term_4_2", "term_4_3", "demonstrable_activity"),
-                ("term_4_2", "term_4_4", "material_mastery"),
-                ("term_4_3", "term_4_4", "technical_power"),
+                ("term_4_1", "term_4_2", "motivational_imperative"),  // Ideal → Ground
+                ("term_4_3", "term_4_4", "demonstrable_activity"),    // Directive → Instrumental
+                ("term_4_4", "term_4_1", "effectual_compatibility"),  // Instrumental → Ideal
+                ("term_4_3", "term_4_1", "receptive_regard"),         // Directive → Ideal
+                ("term_4_3", "term_4_2", "material_mastery"),         // Directive → Ground
+                ("term_4_4", "term_4_2", "technical_power"),          // Instrumental → Ground
             ];
             for (from, to, name) in interplays {
                 let char_id = format!("char_canonical_{}", name);
@@ -432,6 +436,7 @@ fn add_system_links(graph: &mut Graph, order: u8) {
         5 => {
             // Pentad: Mutualities (10 named connectives)
             // Term positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
+            // TODO: Same as tetrad - connectives should be vocabulary-coupled rather than position-based
             let mutualities = [
                 ("term_5_3", "term_5_4", "range_of_potential"),        // Higher Potential → Lower Potential
                 ("term_5_5", "term_5_2", "range_of_significance"),     // Purpose → Source

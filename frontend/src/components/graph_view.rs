@@ -157,11 +157,13 @@ impl ApiGraphView {
             let line_base_pos = line.base_position.unwrap_or(0);
             let line_target_pos = line.target_position.unwrap_or(0);
 
-            // Find the connective that matches this line's positions
+            // Find the connective that matches this line's positions (bidirectional match)
+            // Lines are stored with smaller position first, but connectives preserve semantic direction
             let matching_connective = system.connectives.iter().enumerate().find(|(_, conn)| {
                 let conn_base = conn.base_position.unwrap_or(0);
                 let conn_target = conn.target_position.unwrap_or(0);
-                conn_base == line_base_pos && conn_target == line_target_pos
+                (conn_base == line_base_pos && conn_target == line_target_pos) ||
+                (conn_base == line_target_pos && conn_target == line_base_pos)
             });
 
             let Some((conn_idx, connective)) = matching_connective else {
