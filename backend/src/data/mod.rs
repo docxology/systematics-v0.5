@@ -142,7 +142,7 @@ fn add_system_metadata(graph: &mut Graph) {
         (9, "Transformation"),
         (10, "Intrinsic Harmony"),
         (11, "Articulate Symmetry"),
-        (12, "Harmony"),
+        (12, "Perfection"),
     ];
 
     for (order, coherence) in coherences {
@@ -161,10 +161,10 @@ fn add_system_metadata(graph: &mut Graph) {
         (6, "Laws"),
         (7, "States"),
         (8, "Elements"),
-        (9, "Principles"),
-        (10, "Stages"),
-        (11, "Categories"),
-        (12, "Modalities"),
+        (9, "Needs Research"),
+        (10, "Needs Research"),
+        (11, "Needs Research"),
+        (12, "Needs Research"),
     ];
 
     for (order, designation) in term_designations {
@@ -175,7 +175,7 @@ fn add_system_metadata(graph: &mut Graph) {
 
     // Connective designations
     let connective_designations = [
-        (1, "Connectionless Unity"),
+        (1, "Unity"),
         (2, "Force"),
         (3, "Acts"),
         (4, "Interplays"),
@@ -183,10 +183,10 @@ fn add_system_metadata(graph: &mut Graph) {
         (6, "Steps"),
         (7, "Intervals"),
         (8, "Components"),
-        (9, "Transmutations"),
-        (10, "Progressions"),
-        (11, "Correlations"),
-        (12, "Harmonies"),
+        (9, "Needs Research"),
+        (10, "Needs Research"),
+        (11, "Needs Research"),
+        (12, "Needs Research"),
     ];
 
     for (order, designation) in connective_designations {
