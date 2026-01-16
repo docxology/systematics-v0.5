@@ -1,0 +1,48 @@
+# Actual backend schema (GqlSystemView)
+type Query {
+  system(order: Int!): GqlSystemView
+  allSystems: [GqlSystemView!]!
+  systemByName(name: String!): GqlSystemView
+}
+
+type GqlSystemView {
+  order: Int!
+  name: String
+  coherence: String
+  termDesignation: String
+  connectiveDesignation: String
+  terms: [GqlTerm!]!
+  coordinates: [GqlCoordinate!]!
+  colours: [GqlColour!]!
+  lines: [GqlLink!]!
+  connectives: [GqlLink!]!
+}
+
+type GqlTerm {
+  position: Int!
+  character: GqlCharacter
+}
+
+type GqlCharacter {
+  value: String!
+}
+
+type GqlCoordinate {
+  position: Int!
+  x: Float!
+  y: Float!
+  z: Float!
+}
+
+type GqlColour {
+  position: Int!
+  value: String!
+}
+
+type GqlLink {
+  basePosition: Int
+  targetPosition: Int
+  baseCoordinate: GqlCoordinate
+  targetCoordinate: GqlCoordinate
+  character: GqlCharacter
+}

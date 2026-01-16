@@ -53,3 +53,70 @@ The project is still barely a prototype but for now there are no blockers presen
 I’m very much looking forward to getting past the first development cycle where a kernal already exists and ML techniques come into play for the sake of augmenting human intelligence. This might go a number of ways but at the moment I’m dreaming of self describing protocols, autonomous cosmologies and holonic resource libraries that help us become better stewards.
 
 We shall have to see what becomes.
+
+---
+
+## Project Structure
+
+This repository is organized as a Rust workspace with three independent modules:
+
+```
+philadelphia/
+├── backend/          # Axum GraphQL server (domain logic + API)
+├── middleware/       # Shared types and GraphQL schema
+├── frontend/         # Yew/WASM web interface
+└── docs/archive/     # Historical documentation
+```
+
+### Module Overview
+
+**backend/** - The GraphQL API server built with Axum and async-graphql. Contains:
+- Core domain logic (`core/`) - entries, links, graphs, language processing
+- Data construction (`data/`) - system definitions from orders 1-12
+- GraphQL resolvers (`graphql/`)
+
+**middleware/** - Shared contract between frontend and backend. Contains:
+- Wire format types with feature-gated derives (serde for all, async-graphql for server)
+- GraphQL schema definition
+
+**frontend/** - Rust/WASM single-page application built with Yew. Contains:
+- GraphQL client for API communication
+- SVG graph renderer
+- System selector component
+
+### Prerequisites
+
+- Rust 1.75+ (tested with 1.87.0)
+- [Trunk](https://trunkrs.dev/) for frontend builds: `cargo install trunk`
+- wasm32 target: `rustup target add wasm32-unknown-unknown`
+
+### Building
+
+```bash
+# Build all modules
+cargo build --workspace
+
+# Build release
+cargo build --workspace --release
+```
+
+### Running
+
+```bash
+# Terminal 1: Start the backend server
+cd backend && cargo run
+# → GraphQL API at http://127.0.0.1:8000/graphql
+# → GraphQL Playground at http://127.0.0.1:8000/graphql
+
+# Terminal 2: Start the frontend dev server
+cd frontend && trunk serve
+# → Web interface at http://127.0.0.1:8080
+```
+
+### Architecture Notes
+
+The middleware module uses Cargo features to provide appropriate derives:
+- Backend imports with `features = ["server"]` → gets `async-graphql` derives
+- Frontend imports without that feature → gets just `serde` derives
+
+This ensures a single source of truth for all API types while keeping dependencies minimal for WASM builds.

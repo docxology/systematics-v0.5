@@ -1,0 +1,13 @@
+[package]
+name = "systematics-middleware"
+version = "0.1.0"
+edition = "2021"
+description = "Shared types and GraphQL schema for Systematics"
+
+[features]
+default = []
+server = ["async-graphql"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+async-graphql = { version = "=7.0.7", optional = true }
