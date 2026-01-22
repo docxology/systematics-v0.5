@@ -509,7 +509,7 @@ impl GqlLink {
     async fn link_type(&self) -> GqlLinkType {
         match &self.link.link_type {
             LinkType::Line => GqlLinkType::Line,
-            LinkType::Connective(_) => GqlLinkType::Connective,
+            LinkType::Connective => GqlLinkType::Connective,
         }
     }
 

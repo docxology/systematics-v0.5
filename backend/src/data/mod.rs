@@ -403,55 +403,53 @@ fn add_system_links(graph: &mut Graph, order: u8) {
     // Add connective links for specific orders
     match order {
         3 => {
-            // Triad: Acts between terms
+            // Triad: Acts between locations (simplex-anchored)
             let acts = [
-                ("term_3_1", "term_3_2", "act1"),
-                ("term_3_2", "term_3_3", "act2"),
-                ("term_3_3", "term_3_1", "act3"),
+                ("loc_3_1", "loc_3_2", "act1"),
+                ("loc_3_2", "loc_3_3", "act2"),
+                ("loc_3_3", "loc_3_1", "act3"),
             ];
             for (from, to, act) in acts {
                 let char_id = format!("char_canonical_{}", act);
-                graph.add_link(Link::connective(from, to, &char_id));
+                graph.add_link(Link::connective(from, to).with_tag(&char_id));
             }
         }
         4 => {
-            // Tetrad: Interplays between all pairs
-            // TODO: Connective assignments are currently position-based (term_4_N). Ideally,
-            // connectives should be vocabulary-coupled - if "Ideal" changes to another term,
-            // the connective mappings should update accordingly. This requires a refactor to
-            // reference terms by their character/vocabulary rather than by position.
+            // Tetrad: Interplays between locations (simplex-anchored)
+            // The structural edges are invariant; vocabulary-coupling happens
+            // via dynamic Term lookup at render time (future Option B)
             let interplays = [
-                ("term_4_1", "term_4_2", "motivational_imperative"),  // Ideal → Ground
-                ("term_4_3", "term_4_4", "demonstrable_activity"),    // Directive → Instrumental
-                ("term_4_4", "term_4_1", "effectual_compatibility"),  // Instrumental → Ideal
-                ("term_4_3", "term_4_1", "receptive_regard"),         // Directive → Ideal
-                ("term_4_3", "term_4_2", "material_mastery"),         // Directive → Ground
-                ("term_4_4", "term_4_2", "technical_power"),          // Instrumental → Ground
+                ("loc_4_1", "loc_4_2", "motivational_imperative"),  // Position 1 → Position 2
+                ("loc_4_3", "loc_4_4", "demonstrable_activity"),    // Position 3 → Position 4
+                ("loc_4_4", "loc_4_1", "effectual_compatibility"),  // Position 4 → Position 1
+                ("loc_4_3", "loc_4_1", "receptive_regard"),         // Position 3 → Position 1
+                ("loc_4_3", "loc_4_2", "material_mastery"),         // Position 3 → Position 2
+                ("loc_4_4", "loc_4_2", "technical_power"),          // Position 4 → Position 2
             ];
             for (from, to, name) in interplays {
                 let char_id = format!("char_canonical_{}", name);
-                graph.add_link(Link::connective(from, to, &char_id));
+                graph.add_link(Link::connective(from, to).with_tag(&char_id));
             }
         }
         5 => {
-            // Pentad: Mutualities (10 named connectives)
-            // Term positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
-            // TODO: Same as tetrad - connectives should be vocabulary-coupled rather than position-based
+            // Pentad: Mutualities between locations (simplex-anchored)
+            // Structural positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
+            // Vocabulary-coupling happens via dynamic Term lookup at render time (future Option B)
             let mutualities = [
-                ("term_5_3", "term_5_4", "range_of_potential"),        // Higher Potential → Lower Potential
-                ("term_5_5", "term_5_2", "range_of_significance"),     // Purpose → Source
-                ("term_5_1", "term_5_3", "aspiration"),                // Quintessence → Higher Potential
-                ("term_5_1", "term_5_4", "operation"),                 // Quintessence → Lower Potential
-                ("term_5_3", "term_5_5", "output"),                    // Higher Potential → Purpose
-                ("term_5_4", "term_5_2", "input"),                     // Lower Potential → Source
-                ("term_5_1", "term_5_5", "qualitative_match"),         // Quintessence → Purpose
-                ("term_5_1", "term_5_2", "quantitative_match"),        // Quintessence → Source
-                ("term_5_4", "term_5_5", "form"),                      // Lower Potential → Purpose
-                ("term_5_3", "term_5_2", "function"),                  // Higher Potential → Source
+                ("loc_5_3", "loc_5_4", "range_of_potential"),        // Position 3 → Position 4
+                ("loc_5_5", "loc_5_2", "range_of_significance"),     // Position 5 → Position 2
+                ("loc_5_1", "loc_5_3", "aspiration"),                // Position 1 → Position 3
+                ("loc_5_1", "loc_5_4", "operation"),                 // Position 1 → Position 4
+                ("loc_5_3", "loc_5_5", "output"),                    // Position 3 → Position 5
+                ("loc_5_4", "loc_5_2", "input"),                     // Position 4 → Position 2
+                ("loc_5_1", "loc_5_5", "qualitative_match"),         // Position 1 → Position 5
+                ("loc_5_1", "loc_5_2", "quantitative_match"),        // Position 1 → Position 2
+                ("loc_5_4", "loc_5_5", "form"),                      // Position 4 → Position 5
+                ("loc_5_3", "loc_5_2", "function"),                  // Position 3 → Position 2
             ];
             for (from, to, name) in mutualities {
                 let char_id = format!("char_canonical_{}", name);
-                graph.add_link(Link::connective(from, to, &char_id));
+                graph.add_link(Link::connective(from, to).with_tag(&char_id));
             }
         }
         6..=12 => {
@@ -472,7 +470,7 @@ fn add_system_links(graph: &mut Graph, order: u8) {
     }
 }
 
-/// Add placeholder connective links for orders 6-12
+/// Add placeholder connective links for orders 6-12 (simplex-anchored)
 fn add_placeholder_connectives(graph: &mut Graph, order: u8) {
     let (prefix, _designation) = match order {
         6 => ("step", "Steps"),
@@ -488,10 +486,10 @@ fn add_placeholder_connectives(graph: &mut Graph, order: u8) {
     let mut idx = 1;
     for i in 1..=order {
         for j in (i + 1)..=order {
-            let from = format!("term_{}_{}", order, i);
-            let to = format!("term_{}_{}", order, j);
+            let from = format!("loc_{}_{}", order, i);
+            let to = format!("loc_{}_{}", order, j);
             let char_id = format!("char_canonical_{}_{}_needs_research", prefix, idx);
-            graph.add_link(Link::connective(&from, &to, &char_id));
+            graph.add_link(Link::connective(&from, &to).with_tag(&char_id));
             idx += 1;
         }
     }

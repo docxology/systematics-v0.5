@@ -232,6 +232,20 @@ impl Graph {
             .collect()
     }
 
+    /// Get the (first/canonical) term at a specific location
+    pub fn term_at_location(&self, location_id: &str) -> Option<&Term> {
+        self.entries.iter().find_map(|e| match e {
+            Entry::Term(t) if t.location == location_id => Some(t),
+            _ => None,
+        })
+    }
+
+    /// Get the character of the term at a location (for simplex-anchored connective rendering)
+    pub fn term_character_at(&self, location_id: &str) -> Option<&Character> {
+        let term = self.term_at_location(location_id)?;
+        self.get_character(&term.character)
+    }
+
     /// Get all coordinates for an order
     pub fn coordinates(&self, order: u8) -> Vec<&Coordinate> {
         self.entries
@@ -322,6 +336,7 @@ impl Graph {
     // ==========================================================================
 
     /// Get connective links, optionally filtered by order and/or base/target positions
+    /// Note: Connectives now reference Locations (simplex-anchored), not Terms
     pub fn connectives(
         &self,
         order: u8,
@@ -335,7 +350,7 @@ impl Graph {
                     return false;
                 }
 
-                // Get the terms for base and target using helper methods
+                // Get the locations for base and target
                 let base_id = match l.base_single() {
                     Some(id) => id,
                     None => return false,
@@ -345,25 +360,25 @@ impl Graph {
                     None => return false,
                 };
 
-                let base_term = self.entries.iter().find_map(|e| match e {
-                    Entry::Term(t) if t.id == base_id => Some(t),
+                let base_loc = self.entries.iter().find_map(|e| match e {
+                    Entry::Location(loc) if loc.id == base_id => Some(loc),
                     _ => None,
                 });
-                let target_term = self.entries.iter().find_map(|e| match e {
-                    Entry::Term(t) if t.id == target_id => Some(t),
+                let target_loc = self.entries.iter().find_map(|e| match e {
+                    Entry::Location(loc) if loc.id == target_id => Some(loc),
                     _ => None,
                 });
 
-                // Both terms must exist and be in the specified order
-                match (base_term, target_term) {
-                    (Some(bt), Some(tt))
-                        if bt.order_value() == Some(order) && tt.order_value() == Some(order) =>
+                // Both locations must exist and be in the specified order
+                match (base_loc, target_loc) {
+                    (Some(bl), Some(tl))
+                        if bl.order_value() == Some(order) && tl.order_value() == Some(order) =>
                     {
                         let base_match = base_position
-                            .map(|p| bt.position_value() == Some(p))
+                            .map(|p| bl.position_value() == Some(p))
                             .unwrap_or(true);
                         let target_match = target_position
-                            .map(|p| tt.position_value() == Some(p))
+                            .map(|p| tl.position_value() == Some(p))
                             .unwrap_or(true);
                         base_match && target_match
                     }
@@ -373,15 +388,29 @@ impl Graph {
             .collect()
     }
 
-    /// Get all connectives involving a specific term
-    pub fn connectives_for_term(&self, term_id: &str) -> Vec<&Link> {
+    /// Get all connectives involving a specific location
+    pub fn connectives_for_location(&self, location_id: &str) -> Vec<&Link> {
         self.links
             .iter()
             .filter(|l| {
                 l.is_connective()
-                    && (l.base_single() == Some(term_id) || l.target_single() == Some(term_id))
+                    && (l.base_single() == Some(location_id)
+                        || l.target_single() == Some(location_id))
             })
             .collect()
+    }
+
+    /// Get all connectives involving a specific term (by resolving term to location)
+    pub fn connectives_for_term(&self, term_id: &str) -> Vec<&Link> {
+        // Find the term's location
+        let term = self.entries.iter().find_map(|e| match e {
+            Entry::Term(t) if t.id == term_id => Some(t),
+            _ => None,
+        });
+        match term {
+            Some(t) => self.connectives_for_location(&t.location),
+            None => vec![],
+        }
     }
 
     /// Get all line links for an order

@@ -10,8 +10,9 @@ use serde::{Deserialize, Serialize};
 pub enum LinkType {
     /// Line connects Coordinate → Coordinate (geometric edge)
     Line,
-    /// Connective connects Term → Term, referencing a Character entry
-    Connective(String), // Character ID
+    /// Connective connects Location → Location (simplex-anchored)
+    /// Character ID stored in Link's `tag` field
+    Connective,
 }
 
 /// Link is an explicit relationship between entries.
@@ -64,22 +65,13 @@ impl Link {
         )
     }
 
-    /// Create a Connective link between two terms, referencing a Character
-    pub fn connective(
-        base: impl Into<String>,
-        target: impl Into<String>,
-        character_id: impl Into<String>,
-    ) -> Self {
+    /// Create a Connective link between two locations (simplex-anchored)
+    /// Use `.with_tag(character_id)` to set the label character
+    pub fn connective(base: impl Into<String>, target: impl Into<String>) -> Self {
         let base = base.into();
         let target = target.into();
-        let character_id = character_id.into();
-        let id = format!("conn_{}_{}_{}", base, target, character_id);
-        Self::new(
-            id,
-            Some(vec![base]),
-            Some(vec![target]),
-            LinkType::Connective(character_id),
-        )
+        let id = format!("conn_{}_{}", base, target);
+        Self::new(id, Some(vec![base]), Some(vec![target]), LinkType::Connective)
     }
 
     // =========================================================================
@@ -108,14 +100,15 @@ impl Link {
 
     /// Check if this is a connective link
     pub fn is_connective(&self) -> bool {
-        matches!(self.link_type, LinkType::Connective(_))
+        matches!(self.link_type, LinkType::Connective)
     }
 
-    /// Get the character ID if this is a connective link
+    /// Get the character ID (from tag field) if this is a connective link
     pub fn character_id(&self) -> Option<&str> {
-        match &self.link_type {
-            LinkType::Connective(id) => Some(id),
-            _ => None,
+        if self.is_connective() {
+            self.tag.as_deref()
+        } else {
+            None
         }
     }
 }
@@ -134,11 +127,11 @@ mod tests {
 
     #[test]
     fn test_connective_link() {
-        let link = Link::connective("term_3_1", "term_3_2", "char_act1");
+        let link = Link::connective("loc_3_1", "loc_3_2").with_tag("char_act1");
         assert!(link.is_connective());
         assert_eq!(link.character_id(), Some("char_act1"));
-        assert_eq!(link.base_single(), Some("term_3_1"));
-        assert_eq!(link.target_single(), Some("term_3_2"));
+        assert_eq!(link.base_single(), Some("loc_3_1"));
+        assert_eq!(link.target_single(), Some("loc_3_2"));
     }
 
     #[test]
