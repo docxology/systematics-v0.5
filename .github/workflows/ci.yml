@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+  # sccache configuration
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.6
+
+      - name: Install wasm32 target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install Trunk
+        run: |
+          wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.20.3/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+          sudo mv trunk /usr/local/bin/
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # Format check
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      # Linting (clippy)
+      - name: Clippy (backend)
+        run: cargo clippy --package systematics-backend --all-targets -- -D warnings
+
+      - name: Clippy (middleware)
+        run: cargo clippy --package systematics-middleware --all-features --all-targets -- -D warnings
+
+      - name: Clippy (frontend)
+        run: cargo clippy --package systematics-frontend --target wasm32-unknown-unknown --all-targets -- -D warnings
+
+      # Tests
+      - name: Run tests
+        run: cargo test --workspace --all-features
+
+      - name: Build frontend
+        working-directory: frontend
+        run: trunk build --release
+
+      - name: Build backend
+        run: cargo build --package systematics-backend --release
+
+      # Print sccache stats
+      - name: sccache stats
+        run: sccache --show-stats

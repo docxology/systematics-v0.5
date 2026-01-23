@@ -1,9 +1,31 @@
-use yew::prelude::*;
-use wasm_bindgen_futures::spawn_local;
-use systematics_middleware::SystemView;
 use crate::api::client::GraphQLClient;
 use crate::components::graph_view::ApiGraphView;
-use crate::components::system_selector::{SystemSelector, SystemDisplay};
+use crate::components::system_selector::{SystemDisplay, SystemSelector};
+use systematics_middleware::SystemView;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
+
+/// Detect GraphQL endpoint based on current browser location
+/// - Development (localhost:8080): Points to http://localhost:8000/graphql
+/// - Production (any other domain): Uses relative /graphql (same origin)
+fn get_graphql_endpoint() -> String {
+    use web_sys::window;
+
+    // In WASM, access the browser's location
+    if let Some(window) = window() {
+        if let Ok(location) = window.location().href() {
+            // If we're on Trunk dev server (port 8080), use backend port 8000
+            if location.contains("localhost:8080") || location.contains("127.0.0.1:8080") {
+                return "http://localhost:8000/graphql".to_string();
+            }
+            // Otherwise, we're deployed - use relative path (same origin)
+            return "/graphql".to_string();
+        }
+    }
+
+    // Fallback to relative path (production-like)
+    "/graphql".to_string()
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Breadcrumb {
@@ -35,8 +57,8 @@ impl Component for ApiApp {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        // GraphQL endpoint - systematics backend server
-        let graphql_endpoint = "http://localhost:8000/graphql".to_string();
+        // GraphQL endpoint - auto-detected based on environment
+        let graphql_endpoint = get_graphql_endpoint();
         let graphql_client = GraphQLClient::new(graphql_endpoint);
 
         // Load all systems on initialization
@@ -94,7 +116,10 @@ impl Component for ApiApp {
                 // Add current system to breadcrumbs before navigating
                 if let Some(ref current) = self.selected_system {
                     self.breadcrumbs.push(Breadcrumb {
-                        system_name: current.name.clone().unwrap_or_else(|| current.display_name()),
+                        system_name: current
+                            .name
+                            .clone()
+                            .unwrap_or_else(|| current.display_name()),
                     });
                 }
 
@@ -145,9 +170,13 @@ impl Component for ApiApp {
             ApiAppMsg::SystemsLoaded(systems) => {
                 self.loading = false;
 
-                web_sys::console::log_1(&format!("ApiApp received {} systems", systems.len()).into());
+                web_sys::console::log_1(
+                    &format!("ApiApp received {} systems", systems.len()).into(),
+                );
                 for sys in &systems {
-                    web_sys::console::log_1(&format!("  - order {} ({})", sys.order, sys.display_name()).into());
+                    web_sys::console::log_1(
+                        &format!("  - order {} ({})", sys.order, sys.display_name()).into(),
+                    );
                 }
 
                 // Select the first system by default

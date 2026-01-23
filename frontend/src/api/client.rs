@@ -1,6 +1,6 @@
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
-use systematics_middleware::{SystemView, ApiError, Coordinate};
+use systematics_middleware::{ApiError, Coordinate, SystemView};
 
 /// GraphQL request structure
 #[derive(Serialize)]
@@ -150,13 +150,16 @@ impl GraphQLClient {
 
     /// Fetch a single system by order (1-12)
     pub async fn fetch_system_by_order(&self, order: i32) -> Result<SystemView, ApiError> {
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query GetSystem($order: Int!) {{
                 system(order: $order) {{
                     {}
                 }}
             }}
-        "#, Self::SYSTEM_FIELDS);
+        "#,
+            Self::SYSTEM_FIELDS
+        );
 
         let variables = serde_json::json!({
             "order": order
@@ -167,14 +170,20 @@ impl GraphQLClient {
 
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", ")
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
 
-        let data = response.data
+        let data = response
+            .data
             .ok_or_else(|| ApiError::NotFound(format!("System with order {} not found", order)))?;
 
-        let system = data.system
+        let system = data
+            .system
             .ok_or_else(|| ApiError::NotFound(format!("System with order {} not found", order)))?;
 
         Ok(self.transform_coordinates(system))
@@ -182,13 +191,16 @@ impl GraphQLClient {
 
     /// Fetch a single system by name (uses systemByName API query)
     pub async fn fetch_system(&self, system_name: &str) -> Result<SystemView, ApiError> {
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query GetSystemByName($name: String!) {{
                 systemByName(name: $name) {{
                     {}
                 }}
             }}
-        "#, Self::SYSTEM_FIELDS);
+        "#,
+            Self::SYSTEM_FIELDS
+        );
 
         let variables = serde_json::json!({
             "name": system_name
@@ -199,14 +211,20 @@ impl GraphQLClient {
 
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", ")
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
 
-        let data = response.data
+        let data = response
+            .data
             .ok_or_else(|| ApiError::NotFound(format!("System '{}' not found", system_name)))?;
 
-        let system = data.system_by_name
+        let system = data
+            .system_by_name
             .ok_or_else(|| ApiError::NotFound(format!("System '{}' not found", system_name)))?;
 
         Ok(self.transform_coordinates(system))
@@ -214,32 +232,55 @@ impl GraphQLClient {
 
     /// Fetch all available systems (orders 1-12)
     pub async fn fetch_all_systems(&self) -> Result<Vec<SystemView>, ApiError> {
-        let query = format!(r#"
+        let query = format!(
+            r#"
             query GetAllSystems {{
                 allSystems {{
                     {}
                 }}
             }}
-        "#, Self::SYSTEM_FIELDS);
+        "#,
+            Self::SYSTEM_FIELDS
+        );
 
         let response: GraphQLResponse<AllSystemsQueryResponse> =
             self.execute_query(&query, None).await?;
 
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", ")
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
 
-        let data = response.data
+        let data = response
+            .data
             .ok_or_else(|| ApiError::NotFound("No systems found".to_string()))?;
 
-        web_sys::console::log_1(&format!("Fetched {} systems from allSystems query", data.all_systems.len()).into());
+        web_sys::console::log_1(
+            &format!(
+                "Fetched {} systems from allSystems query",
+                data.all_systems.len()
+            )
+            .into(),
+        );
 
-        let systems: Vec<SystemView> = data.all_systems.into_iter()
+        let systems: Vec<SystemView> = data
+            .all_systems
+            .into_iter()
             .map(|sys| {
                 let transformed = self.transform_coordinates(sys);
-                web_sys::console::log_1(&format!("Loaded system: {} (order {})", transformed.display_name(), transformed.order).into());
+                web_sys::console::log_1(
+                    &format!(
+                        "Loaded system: {} (order {})",
+                        transformed.display_name(),
+                        transformed.order
+                    )
+                    .into(),
+                );
                 transformed
             })
             .collect();
@@ -366,7 +407,7 @@ fn transform_coordinates_to_viewport(
         .into_iter()
         .map(|mut coord| {
             coord.x = (coord.x - center_x) * scale + viewport_center_x;
-            coord.y = -(coord.y - center_y) * scale + viewport_center_y;  // Negate Y for SVG
+            coord.y = -(coord.y - center_y) * scale + viewport_center_y; // Negate Y for SVG
             coord
         })
         .collect()

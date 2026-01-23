@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use systematics_middleware::SystemView;
+use yew::prelude::*;
 
 /// Default colors for rendering
 const DEFAULT_NODE_COLOR: &str = "#4A90E2";
@@ -87,71 +87,96 @@ impl Component for ApiGraphView {
 impl ApiGraphView {
     /// Render edges (lines) from the system
     fn render_edges(&self, system: &SystemView) -> Html {
-        web_sys::console::log_1(&format!("render_edges: {} lines to render", system.lines.len()).into());
+        web_sys::console::log_1(
+            &format!("render_edges: {} lines to render", system.lines.len()).into(),
+        );
 
-        system.lines.iter().map(|line| {
-            // Get positions (1-based from API)
-            let base_pos = line.base_position.unwrap_or(0);
-            let target_pos = line.target_position.unwrap_or(0);
+        system
+            .lines
+            .iter()
+            .map(|line| {
+                // Get positions (1-based from API)
+                let base_pos = line.base_position.unwrap_or(0);
+                let target_pos = line.target_position.unwrap_or(0);
 
-            web_sys::console::log_1(&format!("Line: {} -> {} (base_pos={}, target_pos={})",
-                line.base_id, line.target_id, base_pos, target_pos).into());
+                web_sys::console::log_1(
+                    &format!(
+                        "Line: {} -> {} (base_pos={}, target_pos={})",
+                        line.base_id, line.target_id, base_pos, target_pos
+                    )
+                    .into(),
+                );
 
-            if base_pos <= 0 || target_pos <= 0 {
-                web_sys::console::log_1(&"Skipping line: invalid positions".into());
-                return html! {};
-            }
+                if base_pos <= 0 || target_pos <= 0 {
+                    web_sys::console::log_1(&"Skipping line: invalid positions".into());
+                    return html! {};
+                }
 
-            // Look up coordinates from the system's transformed coordinates array
-            // (Don't use embedded link coordinates - they aren't transformed correctly)
-            let (from_x, from_y) = if let Some(coord) = system.coordinate_at(base_pos) {
-                (coord.x, coord.y)
-            } else {
-                web_sys::console::log_1(&format!("Could not find from coordinate for pos {}", base_pos).into());
-                return html! {};
-            };
+                // Look up coordinates from the system's transformed coordinates array
+                // (Don't use embedded link coordinates - they aren't transformed correctly)
+                let (from_x, from_y) = if let Some(coord) = system.coordinate_at(base_pos) {
+                    (coord.x, coord.y)
+                } else {
+                    web_sys::console::log_1(
+                        &format!("Could not find from coordinate for pos {}", base_pos).into(),
+                    );
+                    return html! {};
+                };
 
-            let (to_x, to_y) = if let Some(coord) = system.coordinate_at(target_pos) {
-                (coord.x, coord.y)
-            } else {
-                web_sys::console::log_1(&format!("Could not find to coordinate for pos {}", target_pos).into());
-                return html! {};
-            };
+                let (to_x, to_y) = if let Some(coord) = system.coordinate_at(target_pos) {
+                    (coord.x, coord.y)
+                } else {
+                    web_sys::console::log_1(
+                        &format!("Could not find to coordinate for pos {}", target_pos).into(),
+                    );
+                    return html! {};
+                };
 
-            // Convert to 0-based for selection comparison
-            let from_idx = (base_pos - 1) as usize;
-            let to_idx = (target_pos - 1) as usize;
+                // Convert to 0-based for selection comparison
+                let from_idx = (base_pos - 1) as usize;
+                let to_idx = (target_pos - 1) as usize;
 
-            let edge_tuple = if from_idx < to_idx {
-                (from_idx, to_idx)
-            } else {
-                (to_idx, from_idx)
-            };
+                let edge_tuple = if from_idx < to_idx {
+                    (from_idx, to_idx)
+                } else {
+                    (to_idx, from_idx)
+                };
 
-            let is_selected = self.selected_edge == Some(edge_tuple);
-            let stroke = if is_selected { SELECTED_EDGE_COLOR } else { DEFAULT_EDGE_COLOR };
-            let stroke_width = if is_selected { 3.0 } else { 1.5 };
+                let is_selected = self.selected_edge == Some(edge_tuple);
+                let stroke = if is_selected {
+                    SELECTED_EDGE_COLOR
+                } else {
+                    DEFAULT_EDGE_COLOR
+                };
+                let stroke_width = if is_selected { 3.0 } else { 1.5 };
 
-            html! {
-                <line
-                    x1={ from_x.to_string() }
-                    y1={ from_y.to_string() }
-                    x2={ to_x.to_string() }
-                    y2={ to_y.to_string() }
-                    stroke={ stroke }
-                    stroke-width={ stroke_width.to_string() }
-                    class="edge"
-                />
-            }
-        }).collect::<Html>()
+                html! {
+                    <line
+                        x1={ from_x.to_string() }
+                        y1={ from_y.to_string() }
+                        x2={ to_x.to_string() }
+                        y2={ to_y.to_string() }
+                        stroke={ stroke }
+                        stroke-width={ stroke_width.to_string() }
+                        class="edge"
+                    />
+                }
+            })
+            .collect::<Html>()
     }
 
     /// Render edge labels for connectives
     /// Instead of iterating connectives independently, we iterate through lines
     /// and find matching connectives to ensure labels align with the correct edges
     fn render_edge_labels(&self, system: &SystemView) -> Html {
-        web_sys::console::log_1(&format!("render_edge_labels: {} lines, {} connectives",
-            system.lines.len(), system.connectives.len()).into());
+        web_sys::console::log_1(
+            &format!(
+                "render_edge_labels: {} lines, {} connectives",
+                system.lines.len(),
+                system.connectives.len()
+            )
+            .into(),
+        );
 
         system.lines.iter().enumerate().map(|(line_idx, line)| {
             let line_base_pos = line.base_position.unwrap_or(0);

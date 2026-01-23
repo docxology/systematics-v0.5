@@ -11,7 +11,7 @@
 //! 4. Add vocabulary-specific content (Characters, Terms, Connectives)
 
 use crate::core::{
-    Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Entry, Graph,
+    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Graph,
     Language, Link, Location, Order, Point3d, Position, SystemName, Term, TermDesignation,
 };
 
@@ -169,7 +169,8 @@ fn add_system_metadata(graph: &mut Graph) {
 
     for (order, designation) in term_designations {
         graph.add_entry(Entry::TermDesignation(TermDesignation::with_auto_id(
-            order, designation,
+            order,
+            designation,
         )));
     }
 
@@ -419,12 +420,12 @@ fn add_system_links(graph: &mut Graph, order: u8) {
             // The structural edges are invariant; vocabulary-coupling happens
             // via dynamic Term lookup at render time (future Option B)
             let interplays = [
-                ("loc_4_1", "loc_4_2", "motivational_imperative"),  // Position 1 → Position 2
-                ("loc_4_3", "loc_4_4", "demonstrable_activity"),    // Position 3 → Position 4
-                ("loc_4_4", "loc_4_1", "effectual_compatibility"),  // Position 4 → Position 1
-                ("loc_4_3", "loc_4_1", "receptive_regard"),         // Position 3 → Position 1
-                ("loc_4_3", "loc_4_2", "material_mastery"),         // Position 3 → Position 2
-                ("loc_4_4", "loc_4_2", "technical_power"),          // Position 4 → Position 2
+                ("loc_4_1", "loc_4_2", "motivational_imperative"), // Position 1 → Position 2
+                ("loc_4_3", "loc_4_4", "demonstrable_activity"),   // Position 3 → Position 4
+                ("loc_4_4", "loc_4_1", "effectual_compatibility"), // Position 4 → Position 1
+                ("loc_4_3", "loc_4_1", "receptive_regard"),        // Position 3 → Position 1
+                ("loc_4_3", "loc_4_2", "material_mastery"),        // Position 3 → Position 2
+                ("loc_4_4", "loc_4_2", "technical_power"),         // Position 4 → Position 2
             ];
             for (from, to, name) in interplays {
                 let char_id = format!("char_canonical_{}", name);
@@ -436,16 +437,16 @@ fn add_system_links(graph: &mut Graph, order: u8) {
             // Structural positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
             // Vocabulary-coupling happens via dynamic Term lookup at render time (future Option B)
             let mutualities = [
-                ("loc_5_3", "loc_5_4", "range_of_potential"),        // Position 3 → Position 4
-                ("loc_5_5", "loc_5_2", "range_of_significance"),     // Position 5 → Position 2
-                ("loc_5_1", "loc_5_3", "aspiration"),                // Position 1 → Position 3
-                ("loc_5_1", "loc_5_4", "operation"),                 // Position 1 → Position 4
-                ("loc_5_3", "loc_5_5", "output"),                    // Position 3 → Position 5
-                ("loc_5_4", "loc_5_2", "input"),                     // Position 4 → Position 2
-                ("loc_5_1", "loc_5_5", "qualitative_match"),         // Position 1 → Position 5
-                ("loc_5_1", "loc_5_2", "quantitative_match"),        // Position 1 → Position 2
-                ("loc_5_4", "loc_5_5", "form"),                      // Position 4 → Position 5
-                ("loc_5_3", "loc_5_2", "function"),                  // Position 3 → Position 2
+                ("loc_5_3", "loc_5_4", "range_of_potential"), // Position 3 → Position 4
+                ("loc_5_5", "loc_5_2", "range_of_significance"), // Position 5 → Position 2
+                ("loc_5_1", "loc_5_3", "aspiration"),         // Position 1 → Position 3
+                ("loc_5_1", "loc_5_4", "operation"),          // Position 1 → Position 4
+                ("loc_5_3", "loc_5_5", "output"),             // Position 3 → Position 5
+                ("loc_5_4", "loc_5_2", "input"),              // Position 4 → Position 2
+                ("loc_5_1", "loc_5_5", "qualitative_match"),  // Position 1 → Position 5
+                ("loc_5_1", "loc_5_2", "quantitative_match"), // Position 1 → Position 2
+                ("loc_5_4", "loc_5_5", "form"),               // Position 4 → Position 5
+                ("loc_5_3", "loc_5_2", "function"),           // Position 3 → Position 2
             ];
             for (from, to, name) in mutualities {
                 let char_id = format!("char_canonical_{}", name);
@@ -548,7 +549,8 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
         ],
         // Ennead: Sequential positions 1-9
         9 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9",
         ],
         // Decad: Sequential positions 1-10
         10 => vec![
@@ -589,11 +591,11 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-1.0, 0.0, 0.0), // Instrumental (left)
         ],
         5 => vec![
-            Point3d::new(-0.75, 0.0, 0.0),  // Quintessence (left-center, middle)
-            Point3d::new(1.0, -0.75, 0.0),  // Source (right, bottom)
-            Point3d::new(0.0, 0.5, 0.0),    // Higher Potential (center, upper)
-            Point3d::new(0.0, -0.5, 0.0),   // Lower Potential (center, lower)
-            Point3d::new(1.0, 0.75, 0.0),   // Purpose (right, top)
+            Point3d::new(-0.75, 0.0, 0.0), // Quintessence (left-center, middle)
+            Point3d::new(1.0, -0.75, 0.0), // Source (right, bottom)
+            Point3d::new(0.0, 0.5, 0.0),   // Higher Potential (center, upper)
+            Point3d::new(0.0, -0.5, 0.0),  // Lower Potential (center, lower)
+            Point3d::new(1.0, 0.75, 0.0),  // Purpose (right, top)
         ],
         6 => vec![
             Point3d::new(-0.866, -0.5, 0.0), // Priorities (lower left)
@@ -613,38 +615,38 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-0.781831, 0.623489, 0.0),  // Value
         ],
         8 => vec![
-            Point3d::new(-0.70710678118, 0.70710678118, 0.0),  // Inherent Values (upper left)
-            Point3d::new(0.70710678118, -0.70710678118, 0.0),  // Critical Functions (lower right)
-            Point3d::new(0.70710678118, 0.70710678118, 0.0),   // Organisational Modes (upper right)
+            Point3d::new(-0.70710678118, 0.70710678118, 0.0), // Inherent Values (upper left)
+            Point3d::new(0.70710678118, -0.70710678118, 0.0), // Critical Functions (lower right)
+            Point3d::new(0.70710678118, 0.70710678118, 0.0),  // Organisational Modes (upper right)
             Point3d::new(-0.70710678118, -0.70710678118, 0.0), // Necessary Resourcing (lower left)
-            Point3d::new(0.0, 1.0, 0.0),                       // Intrinsic Nature (top)
-            Point3d::new(1.0, 0.0, 0.0),                       // Smallest Significant Holon (right)
-            Point3d::new(-1.0, 0.0, 0.0),                      // Integrative Totality (left)
-            Point3d::new(0.0, -1.0, 0.0),                      // Supportive Platform (bottom)
+            Point3d::new(0.0, 1.0, 0.0),                      // Intrinsic Nature (top)
+            Point3d::new(1.0, 0.0, 0.0),                      // Smallest Significant Holon (right)
+            Point3d::new(-1.0, 0.0, 0.0),                     // Integrative Totality (left)
+            Point3d::new(0.0, -1.0, 0.0),                     // Supportive Platform (bottom)
         ],
         // Ennead: 9 points arranged in a circle
         9 => vec![
-            Point3d::new(-0.64278760968, 0.76604444311, 0.0),  // Position 1
-            Point3d::new(0.86602540378, -0.5, 0.0),            // Position 2
-            Point3d::new(0.64278760968, 0.76604444311, 0.0),   // Position 3
+            Point3d::new(-0.64278760968, 0.76604444311, 0.0), // Position 1
+            Point3d::new(0.86602540378, -0.5, 0.0),           // Position 2
+            Point3d::new(0.64278760968, 0.76604444311, 0.0),  // Position 3
             Point3d::new(-0.34202014333, -0.93969262079, 0.0), // Position 4
-            Point3d::new(0.0, 1.0, 0.0),                       // Position 5
-            Point3d::new(0.98480775301, 0.17364817767, 0.0),   // Position 6
-            Point3d::new(-0.98480775301, 0.17364817767, 0.0),  // Position 7
-            Point3d::new(0.34202014333, -0.93969262079, 0.0),  // Position 8
-            Point3d::new(-0.86602540378, -0.5, 0.0),           // Position 9
+            Point3d::new(0.0, 1.0, 0.0),                      // Position 5
+            Point3d::new(0.98480775301, 0.17364817767, 0.0),  // Position 6
+            Point3d::new(-0.98480775301, 0.17364817767, 0.0), // Position 7
+            Point3d::new(0.34202014333, -0.93969262079, 0.0), // Position 8
+            Point3d::new(-0.86602540378, -0.5, 0.0),          // Position 9
         ],
         // Decad: 10 points arranged in a circle
         10 => vec![
-            Point3d::new(-0.80901699437, 0.58778525229, 0.0),  // Position 1
-            Point3d::new(0.80901699437, -0.58778525229, 0.0),  // Position 2
-            Point3d::new(0.30901699437, 0.95105651630, 0.0),   // Position 3
+            Point3d::new(-0.80901699437, 0.58778525229, 0.0), // Position 1
+            Point3d::new(0.80901699437, -0.58778525229, 0.0), // Position 2
+            Point3d::new(0.30901699437, 0.95105651630, 0.0),  // Position 3
             Point3d::new(-0.30901699437, -0.95105651630, 0.0), // Position 4
-            Point3d::new(-0.30901699437, 0.95105651630, 0.0),  // Position 5
-            Point3d::new(0.80901699437, 0.58778525229, 0.0),   // Position 6
-            Point3d::new(-1.0, 0.0, 0.0),                      // Position 7
-            Point3d::new(0.30901699437, -0.95105651630, 0.0),  // Position 8
-            Point3d::new(1.0, 0.0, 0.0),                       // Position 9
+            Point3d::new(-0.30901699437, 0.95105651630, 0.0), // Position 5
+            Point3d::new(0.80901699437, 0.58778525229, 0.0),  // Position 6
+            Point3d::new(-1.0, 0.0, 0.0),                     // Position 7
+            Point3d::new(0.30901699437, -0.95105651630, 0.0), // Position 8
+            Point3d::new(1.0, 0.0, 0.0),                      // Position 9
             Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10
         ],
         // Undecad: 11 points arranged in a circle
@@ -663,18 +665,18 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
         ],
         // Dodecad: 12 points arranged in a circle
         12 => vec![
-            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 1
-            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 2
-            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3
-            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 4
-            Point3d::new(1.0, 0.0, 0.0),                 // Position 5
-            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 6
-            Point3d::new(0.0, -1.0, 0.0),                // Position 7
-            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8
-            Point3d::new(0.0, 1.0, 0.0),                 // Position 9
-            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 10
-            Point3d::new(-1.0, 0.0, 0.0),                // Position 11
-            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 12
+            Point3d::new(-0.5, 0.86602540378, 0.0),  // Position 1
+            Point3d::new(0.86602540378, -0.5, 0.0),  // Position 2
+            Point3d::new(0.86602540378, 0.5, 0.0),   // Position 3
+            Point3d::new(-0.86602540378, -0.5, 0.0), // Position 4
+            Point3d::new(1.0, 0.0, 0.0),             // Position 5
+            Point3d::new(0.5, 0.86602540378, 0.0),   // Position 6
+            Point3d::new(0.0, -1.0, 0.0),            // Position 7
+            Point3d::new(-0.5, -0.86602540378, 0.0), // Position 8
+            Point3d::new(0.0, 1.0, 0.0),             // Position 9
+            Point3d::new(0.5, -0.86602540378, 0.0),  // Position 10
+            Point3d::new(-1.0, 0.0, 0.0),            // Position 11
+            Point3d::new(-0.86602540378, 0.5, 0.0),  // Position 12
         ],
         _ => vec![],
     }

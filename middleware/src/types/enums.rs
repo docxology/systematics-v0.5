@@ -27,7 +27,10 @@ pub enum Language {
 impl Language {
     /// Check if this is a vocabulary language (for Character entries)
     pub fn is_vocabulary(&self) -> bool {
-        matches!(self, Language::Canonical | Language::Energy | Language::Values | Language::Society)
+        matches!(
+            self,
+            Language::Canonical | Language::Energy | Language::Values | Language::Society
+        )
     }
 
     /// Check if this is a representation language (for Colour entries)
@@ -37,7 +40,12 @@ impl Language {
 
     /// Get all vocabulary languages
     pub fn all_vocabularies() -> [Language; 4] {
-        [Language::Canonical, Language::Energy, Language::Values, Language::Society]
+        [
+            Language::Canonical,
+            Language::Energy,
+            Language::Values,
+            Language::Society,
+        ]
     }
 
     /// Get all representation languages

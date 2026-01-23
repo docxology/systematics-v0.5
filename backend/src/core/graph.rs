@@ -10,7 +10,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::entries::{
-    Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Entry, Location,
+    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Location,
     Order, Position, SystemName, Term, TermDesignation,
 };
 use super::language::Language;

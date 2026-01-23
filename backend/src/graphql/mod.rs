@@ -2,4 +2,4 @@
 
 pub mod types;
 
-pub use types::{create_schema, SystematicsSchema, QueryRoot};
+pub use types::{create_schema, QueryRoot, SystematicsSchema};

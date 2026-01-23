@@ -1,0 +1,6 @@
+name = "systematics-v05"
+
+[build]
+# Include frontend dist folder for static file serving
+# The backend will serve these files via ServeDir
+assets = ["frontend/dist/*"]

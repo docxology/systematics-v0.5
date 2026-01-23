@@ -2,9 +2,9 @@
 //!
 //! Yew-based WASM frontend for visualizing Systematics graphs.
 
+mod api;
 mod app;
 mod components;
-mod api;
 
 use wasm_bindgen::prelude::*;
 
