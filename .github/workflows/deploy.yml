@@ -7,8 +7,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "true"
-  RUSTC_WRAPPER: "sccache"
 
 jobs:
   deploy:
@@ -21,9 +19,6 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.6
 
       - name: Install wasm32 target
         run: rustup target add wasm32-unknown-unknown
@@ -64,6 +59,3 @@ jobs:
           deploy-key: ${{ secrets.SHUTTLE_API_KEY }}
           working-directory: backend
           cargo-shuttle-version: "0.50.0"
-
-      - name: Print sccache stats
-        run: sccache --show-stats
