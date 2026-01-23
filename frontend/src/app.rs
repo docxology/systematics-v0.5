@@ -35,7 +35,7 @@ pub struct Breadcrumb {
 pub enum ApiAppMsg {
     SelectSystem(String),
     SystemsLoaded(Vec<SystemView>),
-    SystemLoaded(SystemView),
+    SystemLoaded(Box<SystemView>),
     LoadError(String),
     NavigateToSystem(String),
     NavigateBack,
@@ -102,7 +102,7 @@ impl Component for ApiApp {
                 spawn_local(async move {
                     match client.fetch_system(&name).await {
                         Ok(system) => {
-                            link.send_message(ApiAppMsg::SystemLoaded(system));
+                            link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
                         }
                         Err(e) => {
                             link.send_message(ApiAppMsg::LoadError(e.to_string()));
@@ -133,7 +133,7 @@ impl Component for ApiApp {
                 spawn_local(async move {
                     match client.fetch_system(&name).await {
                         Ok(system) => {
-                            link.send_message(ApiAppMsg::SystemLoaded(system));
+                            link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
                         }
                         Err(e) => {
                             link.send_message(ApiAppMsg::LoadError(e.to_string()));
@@ -156,7 +156,7 @@ impl Component for ApiApp {
                     spawn_local(async move {
                         match client.fetch_system(&name).await {
                             Ok(system) => {
-                                link.send_message(ApiAppMsg::SystemLoaded(system));
+                                link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
                             }
                             Err(e) => {
                                 link.send_message(ApiAppMsg::LoadError(e.to_string()));
@@ -189,7 +189,7 @@ impl Component for ApiApp {
             }
             ApiAppMsg::SystemLoaded(system) => {
                 self.loading = false;
-                self.selected_system = Some(system);
+                self.selected_system = Some(*system);
                 true
             }
             ApiAppMsg::LoadError(error) => {

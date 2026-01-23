@@ -18,6 +18,7 @@ pub struct ApiGraphViewProps {
 
 pub enum ApiGraphMsg {
     NodeClicked(usize),
+    #[allow(dead_code)]
     EdgeClicked(usize, usize),
 }
 
@@ -235,7 +236,7 @@ impl ApiGraphView {
             let angle = dy.atan2(dx) * 180.0 / std::f64::consts::PI;
 
             // Keep text readable (not upside down)
-            let rotation_angle = if angle > 90.0 || angle < -90.0 {
+            let rotation_angle = if !(-90.0..=90.0).contains(&angle) {
                 angle + 180.0
             } else {
                 angle

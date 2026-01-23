@@ -28,7 +28,7 @@ impl QueryRoot {
 
     /// Get an Order anchor by value (1-12)
     async fn order(&self, value: i32) -> Option<GqlOrder> {
-        if value < 1 || value > 12 {
+        if !(1..=12).contains(&value) {
             return None;
         }
         let graph = data::build_graph();
@@ -49,7 +49,7 @@ impl QueryRoot {
 
     /// Get a Position anchor by value (1-12)
     async fn position(&self, value: i32) -> Option<GqlPosition> {
-        if value < 1 || value > 12 {
+        if !(1..=12).contains(&value) {
             return None;
         }
         let graph = data::build_graph();
@@ -70,7 +70,7 @@ impl QueryRoot {
 
     /// Get a Location anchor by order and position
     async fn location(&self, order: i32, position: i32) -> Option<GqlLocation> {
-        if order < 1 || order > 12 || position < 1 || position > order {
+        if !(1..=12).contains(&order) || position < 1 || position > order {
             return None;
         }
         let graph = data::build_graph();
@@ -115,7 +115,7 @@ impl QueryRoot {
 
     /// Get system by order (1-12)
     async fn system(&self, order: i32) -> Option<GqlSystemView> {
-        if order < 1 || order > 12 {
+        if !(1..=12).contains(&order) {
             return None;
         }
         let graph = data::build_graph();

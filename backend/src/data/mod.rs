@@ -615,10 +615,10 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-0.781831, 0.623489, 0.0),  // Value
         ],
         8 => vec![
-            Point3d::new(-0.70710678118, 0.70710678118, 0.0), // Inherent Values (upper left)
-            Point3d::new(0.70710678118, -0.70710678118, 0.0), // Critical Functions (lower right)
-            Point3d::new(0.70710678118, 0.70710678118, 0.0),  // Organisational Modes (upper right)
-            Point3d::new(-0.70710678118, -0.70710678118, 0.0), // Necessary Resourcing (lower left)
+            Point3d::new(-std::f64::consts::FRAC_1_SQRT_2, std::f64::consts::FRAC_1_SQRT_2, 0.0), // Inherent Values (upper left)
+            Point3d::new(std::f64::consts::FRAC_1_SQRT_2, -std::f64::consts::FRAC_1_SQRT_2, 0.0), // Critical Functions (lower right)
+            Point3d::new(std::f64::consts::FRAC_1_SQRT_2, std::f64::consts::FRAC_1_SQRT_2, 0.0),  // Organisational Modes (upper right)
+            Point3d::new(-std::f64::consts::FRAC_1_SQRT_2, -std::f64::consts::FRAC_1_SQRT_2, 0.0), // Necessary Resourcing (lower left)
             Point3d::new(0.0, 1.0, 0.0),                      // Intrinsic Nature (top)
             Point3d::new(1.0, 0.0, 0.0),                      // Smallest Significant Holon (right)
             Point3d::new(-1.0, 0.0, 0.0),                     // Integrative Totality (left)

@@ -23,6 +23,7 @@ struct GraphQLError {
 }
 
 /// System query response (for system(order:) query)
+#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct SystemQueryResponse {
     system: Option<SystemView>,
@@ -149,6 +150,7 @@ impl GraphQLClient {
     "#;
 
     /// Fetch a single system by order (1-12)
+    #[allow(dead_code)]
     pub async fn fetch_system_by_order(&self, order: i32) -> Result<SystemView, ApiError> {
         let query = format!(
             r#"
