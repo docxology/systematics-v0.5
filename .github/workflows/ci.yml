@@ -62,7 +62,7 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
-        run: trunk build --release
+        run: trunk build --release --no-minify
 
       - name: Build backend
         run: cargo build --package systematics-backend --release

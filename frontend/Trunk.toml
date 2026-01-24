@@ -5,8 +5,6 @@ command_arguments = ["Building systematics-interface..."]
 
 [build]
 target = "index.html"
-# Disable wasm-opt due to parsing errors with Rust 1.93.0 output
-wasm-opt = false
 
 [watch]
 # ignore = ["target"]

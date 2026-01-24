@@ -41,7 +41,7 @@ jobs:
       # CRITICAL: Build frontend BEFORE deploying backend
       - name: Build frontend with Trunk
         working-directory: frontend
-        run: trunk build --release
+        run: trunk build --release --no-minify
 
       # Verify frontend build succeeded
       - name: Verify frontend dist exists
