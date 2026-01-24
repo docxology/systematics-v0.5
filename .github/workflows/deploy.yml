@@ -90,7 +90,7 @@ jobs:
         run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 
       - name: Install Shuttle CLI
-        run: cargo binstall -y cargo-shuttle@0.50.0
+        run: cargo binstall -y cargo-shuttle@0.52.0
 
       # Deploy to Shuttle using CLI directly (bypass action for initial setup)
       - name: Deploy to Shuttle
