@@ -60,10 +60,12 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-features
 
-      - name: Create dummy wasm-opt to bypass optimization
+      - name: Create dummy wasm-opt in Trunk cache to bypass optimization
         run: |
-          mkdir -p ~/.cargo/bin
-          cat > ~/.cargo/bin/wasm-opt << 'EOF'
+          # Trunk downloads wasm-opt to ~/.cache/trunk/wasm-opt-version_116/bin/
+          # Pre-create a dummy version so Trunk uses it instead of downloading
+          mkdir -p ~/.cache/trunk/wasm-opt-version_116/bin
+          cat > ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt << 'EOF'
           #!/bin/bash
           # Dummy wasm-opt that just copies input to output (bypasses optimization)
           # This works around incompatibility between Rust 1.93.0 and wasm-opt v116
@@ -88,9 +90,7 @@ jobs:
           fi
           exit 0
           EOF
-          chmod +x ~/.cargo/bin/wasm-opt
-          export PATH="$HOME/.cargo/bin:$PATH"
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          chmod +x ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt
 
       - name: Build frontend
         working-directory: frontend
