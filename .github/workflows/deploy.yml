@@ -92,3 +92,5 @@ jobs:
           shuttle-api-key: ${{ secrets.SHUTTLE_API_KEY }}
           working-directory: backend
           cargo-shuttle-version: "0.50.0"
+          # Use project name from Shuttle.toml for initial deployment
+          extra-args: "--name systematics-v05 --allow-dirty"
