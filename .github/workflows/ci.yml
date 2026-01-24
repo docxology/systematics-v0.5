@@ -60,9 +60,41 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-features
 
+      - name: Create dummy wasm-opt to bypass optimization
+        run: |
+          mkdir -p ~/.cargo/bin
+          cat > ~/.cargo/bin/wasm-opt << 'EOF'
+          #!/bin/bash
+          # Dummy wasm-opt that just copies input to output (bypasses optimization)
+          # This works around incompatibility between Rust 1.93.0 and wasm-opt v116
+          if [[ "$*" =~ --output=([^[:space:]]+) ]]; then
+            output="${BASH_REMATCH[1]}"
+          elif [[ "$2" == "--output" ]]; then
+            output="$3"
+          else
+            for ((i=1; i<=$#; i++)); do
+              if [[ "${!i}" == "--output" ]]; then
+                j=$((i+1))
+                output="${!j}"
+                break
+              fi
+            done
+          fi
+          # Find the input file (last argument)
+          input="${@: -1}"
+          if [ -n "$output" ] && [ -f "$input" ]; then
+            cp "$input" "$output"
+            exit 0
+          fi
+          exit 0
+          EOF
+          chmod +x ~/.cargo/bin/wasm-opt
+          export PATH="$HOME/.cargo/bin:$PATH"
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
       - name: Build frontend
         working-directory: frontend
-        run: trunk build --release --no-minify
+        run: trunk build --release
 
       - name: Build backend
         run: cargo build --package systematics-backend --release
