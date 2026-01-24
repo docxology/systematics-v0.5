@@ -87,8 +87,8 @@ jobs:
 
       # Deploy to Shuttle (includes backend build with --features shuttle)
       - name: Deploy to Shuttle
-        uses: shuttle-hq/deploy-action@v1
+        uses: shuttle-hq/deploy-action@v2
         with:
-          deploy-key: ${{ secrets.SHUTTLE_API_KEY }}
+          shuttle-api-key: ${{ secrets.SHUTTLE_API_KEY }}
           working-directory: backend
           cargo-shuttle-version: "0.50.0"
