@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Install wasm32 target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install Trunk
+        run: |
+          wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.20.3/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
+          sudo mv trunk /usr/local/bin/
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # Format check
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      # Linting (clippy)
+      - name: Clippy (backend)
+        run: cargo clippy --package systematics-backend --all-targets -- -D warnings
+
+      - name: Clippy (middleware)
+        run: cargo clippy --package systematics-middleware --all-features --all-targets -- -D warnings
+
+      - name: Clippy (frontend)
+        run: cargo clippy --package systematics-frontend --target wasm32-unknown-unknown --all-targets -- -D warnings
+
+      # Tests
+      - name: Run tests
+        run: cargo test --workspace --all-features
+
+      - name: Create dummy wasm-opt in Trunk cache to bypass optimization
+        run: |
+          # Trunk downloads wasm-opt to ~/.cache/trunk/wasm-opt-version_116/bin/
+          # Pre-create a dummy version so Trunk uses it instead of downloading
+          mkdir -p ~/.cache/trunk/wasm-opt-version_116/bin
+          cat > ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt << 'EOF'
+          #!/bin/bash
+          # Dummy wasm-opt that just copies input to output (bypasses optimization)
+          # This works around incompatibility between Rust 1.93.0 and wasm-opt v116
+          if [[ "$*" =~ --output=([^[:space:]]+) ]]; then
+            output="${BASH_REMATCH[1]}"
+          elif [[ "$2" == "--output" ]]; then
+            output="$3"
+          else
+            for ((i=1; i<=$#; i++)); do
+              if [[ "${!i}" == "--output" ]]; then
+                j=$((i+1))
+                output="${!j}"
+                break
+              fi
+            done
+          fi
+          # Find the input file (last argument)
+          input="${@: -1}"
+          if [ -n "$output" ] && [ -f "$input" ]; then
+            cp "$input" "$output"
+            exit 0
+          fi
+          exit 0
+          EOF
+          chmod +x ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt
+
+      - name: Build frontend
+        working-directory: frontend
+        run: trunk build --release
+
+      - name: Build backend
+        run: cargo build --package systematics-backend --release

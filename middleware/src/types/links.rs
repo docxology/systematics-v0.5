@@ -1,7 +1,7 @@
 //! Link types for Systematics wire format
 
+use super::{Character, Coordinate, LinkType};
 use serde::{Deserialize, Serialize};
-use super::{LinkType, Character, Coordinate};
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;

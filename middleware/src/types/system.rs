@@ -1,7 +1,7 @@
 //! System view types for Systematics wire format
 
+use super::{Colour, Coordinate, Link, Term};
 use serde::{Deserialize, Serialize};
-use super::{Term, Coordinate, Colour, Link};
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;
@@ -45,7 +45,8 @@ impl SystemView {
                 11 => "Undecad",
                 12 => "Dodecad",
                 _ => "Unknown",
-            }.to_string()
+            }
+            .to_string()
         })
     }
 
@@ -56,7 +57,9 @@ impl SystemView {
 
     /// Get the description/coherence for this system
     pub fn description(&self) -> String {
-        self.coherence.clone().unwrap_or_else(|| self.display_name())
+        self.coherence
+            .clone()
+            .unwrap_or_else(|| self.display_name())
     }
 
     /// Get the number of nodes in this system
@@ -66,7 +69,8 @@ impl SystemView {
 
     /// Get the term value at a position (1-based)
     pub fn term_at(&self, position: i32) -> Option<&str> {
-        self.terms.iter()
+        self.terms
+            .iter()
             .find(|t| t.position == position)
             .and_then(|t| t.character.as_ref())
             .map(|c| c.value.as_str())
@@ -74,14 +78,14 @@ impl SystemView {
 
     /// Get the colour value at a position (1-based)
     pub fn colour_at(&self, position: i32) -> Option<&str> {
-        self.colours.iter()
+        self.colours
+            .iter()
             .find(|c| c.position == position)
             .map(|c| c.value.as_str())
     }
 
     /// Get the coordinate at a position (1-based)
     pub fn coordinate_at(&self, position: i32) -> Option<&Coordinate> {
-        self.coordinates.iter()
-            .find(|c| c.position == position)
+        self.coordinates.iter().find(|c| c.position == position)
     }
 }

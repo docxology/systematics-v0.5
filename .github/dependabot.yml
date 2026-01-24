@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Group all dependency updates into a single PR
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    # Don't rebase PRs (can cause conflicts)
+    rebase-strategy: "disabled"

@@ -117,7 +117,9 @@ impl Location {
 
     /// Extract order value from order reference ID
     pub fn order_value(&self) -> Option<u8> {
-        self.order.strip_prefix("order_").and_then(|s| s.parse().ok())
+        self.order
+            .strip_prefix("order_")
+            .and_then(|s| s.parse().ok())
     }
 
     /// Extract position value from position reference ID
@@ -222,7 +224,9 @@ impl SystemName {
 
     /// Extract order value from order reference ID
     pub fn order_value(&self) -> Option<u8> {
-        self.order.strip_prefix("order_").and_then(|s| s.parse().ok())
+        self.order
+            .strip_prefix("order_")
+            .and_then(|s| s.parse().ok())
     }
 }
 
@@ -257,7 +261,9 @@ impl CoherenceAttribute {
 
     /// Extract order value from order reference ID
     pub fn order_value(&self) -> Option<u8> {
-        self.order.strip_prefix("order_").and_then(|s| s.parse().ok())
+        self.order
+            .strip_prefix("order_")
+            .and_then(|s| s.parse().ok())
     }
 }
 
@@ -292,7 +298,9 @@ impl TermDesignation {
 
     /// Extract order value from order reference ID
     pub fn order_value(&self) -> Option<u8> {
-        self.order.strip_prefix("order_").and_then(|s| s.parse().ok())
+        self.order
+            .strip_prefix("order_")
+            .and_then(|s| s.parse().ok())
     }
 }
 
@@ -327,7 +335,9 @@ impl ConnectiveDesignation {
 
     /// Extract order value from order reference ID
     pub fn order_value(&self) -> Option<u8> {
-        self.order.strip_prefix("order_").and_then(|s| s.parse().ok())
+        self.order
+            .strip_prefix("order_")
+            .and_then(|s| s.parse().ok())
     }
 }
 

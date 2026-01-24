@@ -16,8 +16,8 @@ pub use language::Language;
 
 // Re-export entry types (including Entry enum and anchor types)
 pub use entries::{
-    Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Entry,
-    Location, Order, Point3d, Position, SystemName, Term, TermDesignation,
+    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Location,
+    Order, Point3d, Position, SystemName, Term, TermDesignation,
 };
 
 // Re-export link types

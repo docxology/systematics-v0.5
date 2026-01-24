@@ -6,12 +6,20 @@ use axum::{
     routing::get,
     Router,
 };
-use std::net::SocketAddr;
 use systematics_backend::create_schema;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-async fn graphql_handler(State(schema): State<systematics_backend::SystematicsSchema>, req: GraphQLRequest) -> GraphQLResponse {
+#[cfg(not(feature = "shuttle"))]
+use std::net::SocketAddr;
+
+#[cfg(feature = "shuttle")]
+use tower_http::services::{ServeDir, ServeFile};
+
+async fn graphql_handler(
+    State(schema): State<systematics_backend::SystematicsSchema>,
+    req: GraphQLRequest,
+) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -19,9 +27,8 @@ async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
-#[tokio::main]
-async fn main() {
-    // Initialize tracing
+/// Initialize tracing subscriber
+fn init_tracing() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -29,27 +36,60 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
+}
 
-    // Create GraphQL schema
+/// Build the GraphQL API router (shared between local and Shuttle)
+fn build_api_router() -> Router {
     let schema = create_schema();
 
-    // Configure CORS
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    // Build router
-    let app = Router::new()
+    Router::new()
         .route("/graphql", get(graphql_playground).post(graphql_handler))
         .layer(cors)
-        .with_state(schema);
+        .with_state(schema)
+}
 
-    // Run server
+// Local development runtime (tokio)
+#[cfg(not(feature = "shuttle"))]
+#[tokio::main]
+async fn main() {
+    init_tracing();
+
+    let app = build_api_router();
+
     let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     tracing::info!("GraphQL server running at http://{}/graphql", addr);
     tracing::info!("GraphQL playground available at http://{}/graphql", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+// Production deployment runtime (Shuttle)
+#[cfg(feature = "shuttle")]
+#[shuttle_runtime::main]
+async fn main() -> shuttle_axum::ShuttleAxum {
+    init_tracing();
+
+    // Build API routes
+    let api_router = build_api_router();
+
+    // Serve static files from frontend/dist
+    // Fallback to index.html for SPA routing
+    let static_files = ServeDir::new("frontend/dist")
+        .not_found_service(ServeFile::new("frontend/dist/index.html"));
+
+    // Combine routes: API takes precedence, then static files
+    let app = Router::new()
+        .nest("/", api_router)
+        .fallback_service(static_files);
+
+    tracing::info!("GraphQL API configured at /graphql");
+    tracing::info!("Static files served from frontend/dist");
+
+    Ok(app.into())
 }

@@ -1,7 +1,7 @@
 //! Entry types for Systematics wire format
 
-use serde::{Deserialize, Serialize};
 use super::Language;
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;

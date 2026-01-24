@@ -57,12 +57,7 @@ impl Link {
         let base = base.into();
         let target = target.into();
         let id = format!("line_{}_{}", base, target);
-        Self::new(
-            id,
-            Some(vec![base]),
-            Some(vec![target]),
-            LinkType::Line,
-        )
+        Self::new(id, Some(vec![base]), Some(vec![target]), LinkType::Line)
     }
 
     /// Create a Connective link between two locations (simplex-anchored)
@@ -71,7 +66,12 @@ impl Link {
         let base = base.into();
         let target = target.into();
         let id = format!("conn_{}_{}", base, target);
-        Self::new(id, Some(vec![base]), Some(vec![target]), LinkType::Connective)
+        Self::new(
+            id,
+            Some(vec![base]),
+            Some(vec![target]),
+            LinkType::Connective,
+        )
     }
 
     // =========================================================================
@@ -80,12 +80,16 @@ impl Link {
 
     /// Get the first base ID (for single-base links)
     pub fn base_single(&self) -> Option<&str> {
-        self.base.as_ref().and_then(|v| v.first().map(|s| s.as_str()))
+        self.base
+            .as_ref()
+            .and_then(|v| v.first().map(|s| s.as_str()))
     }
 
     /// Get the first target ID (for single-target links)
     pub fn target_single(&self) -> Option<&str> {
-        self.target.as_ref().and_then(|v| v.first().map(|s| s.as_str()))
+        self.target
+            .as_ref()
+            .and_then(|v| v.first().map(|s| s.as_str()))
     }
 
     /// Get all base IDs
