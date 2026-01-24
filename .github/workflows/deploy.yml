@@ -85,12 +85,19 @@ jobs:
           fi
           ls -la frontend/dist/
 
-      # Deploy to Shuttle (includes backend build with --features shuttle)
+      # Install Shuttle CLI using cargo-binstall for speed
+      - name: Install cargo-binstall
+        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+
+      - name: Install Shuttle CLI
+        run: cargo binstall -y cargo-shuttle@0.50.0
+
+      # Deploy to Shuttle using CLI directly (bypass action for initial setup)
       - name: Deploy to Shuttle
-        uses: shuttle-hq/deploy-action@v2
-        with:
-          shuttle-api-key: ${{ secrets.SHUTTLE_API_KEY }}
-          working-directory: backend
-          cargo-shuttle-version: "0.50.0"
-          # Use project name from Shuttle.toml for initial deployment
-          extra-args: "--name systematics-v05 --allow-dirty"
+        working-directory: backend
+        env:
+          SHUTTLE_API_KEY: ${{ secrets.SHUTTLE_API_KEY }}
+        run: |
+          # Use shuttle CLI directly for first-time deployment
+          # The shuttle deploy command will create the project if it doesn't exist
+          shuttle deploy --name systematics-v05 --allow-dirty
