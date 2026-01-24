@@ -1,0 +1,6 @@
+name = "systematics-v05"
+
+[build]
+# Include frontend dist folder for static file serving
+# Path is relative from backend/ directory
+assets = ["../frontend/dist/*"]
