@@ -1,4 +1,4 @@
-name = "systematics-v05"
+name = "systematics-hk"
 
 [build]
 # Include frontend dist folder for static file serving

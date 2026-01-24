@@ -100,4 +100,4 @@ jobs:
         run: |
           # Use shuttle CLI directly for first-time deployment
           # The shuttle deploy command will create the project if it doesn't exist
-          shuttle deploy --name systematics-v05 --allow-dirty
+          shuttle deploy --name systematics-hk --allow-dirty
