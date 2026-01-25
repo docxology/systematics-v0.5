@@ -2,7 +2,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 
 app = 'systematics-v0-5'
-primary_region = 'sea'
+primary_region = 'sjc'
 
 [build]
 
