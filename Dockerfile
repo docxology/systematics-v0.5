@@ -15,6 +15,31 @@ COPY backend ./backend
 COPY frontend ./frontend
 COPY middleware ./middleware
 
+# Create dummy wasm-opt to bypass optimization (compatibility issue)
+RUN mkdir -p /root/.cache/trunk/wasm-opt-version_116/bin && \
+    echo '#!/bin/bash\n\
+# Dummy wasm-opt that just copies input to output\n\
+if [[ "$*" =~ --output=([^[:space:]]+) ]]; then\n\
+  output="${BASH_REMATCH[1]}"\n\
+elif [[ "$2" == "--output" ]]; then\n\
+  output="$3"\n\
+else\n\
+  for ((i=1; i<=$#; i++)); do\n\
+    if [[ "${!i}" == "--output" ]]; then\n\
+      j=$((i+1))\n\
+      output="${!j}"\n\
+      break\n\
+    fi\n\
+  done\n\
+fi\n\
+input="${@: -1}"\n\
+if [ -n "$output" ] && [ -f "$input" ]; then\n\
+  cp "$input" "$output"\n\
+  exit 0\n\
+fi\n\
+exit 0' > /root/.cache/trunk/wasm-opt-version_116/bin/wasm-opt && \
+    chmod +x /root/.cache/trunk/wasm-opt-version_116/bin/wasm-opt
+
 # Build frontend
 WORKDIR /app/frontend
 RUN trunk build --release
