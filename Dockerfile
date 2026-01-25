@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Build stage for frontend
-FROM rust:1.84-bookworm AS frontend-builder
+FROM rustlang/rust:nightly-bookworm AS frontend-builder
 
 # Install Trunk and wasm32 target
 RUN cargo install --locked trunk@0.20.3 && \
