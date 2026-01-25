@@ -23,9 +23,10 @@ FROM rust:1.83-bookworm AS backend-builder
 
 WORKDIR /app
 
-# Copy workspace files
+# Copy workspace files (need all members for workspace)
 COPY Cargo.toml Cargo.lock ./
 COPY backend ./backend
+COPY frontend ./frontend
 COPY middleware ./middleware
 
 # Build backend in release mode
