@@ -1,4 +1,4 @@
-app = "systematics-hk"
+app = "systematics-v0-5"
 primary_region = "sea"
 
 [build]
