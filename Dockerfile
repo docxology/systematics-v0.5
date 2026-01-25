@@ -9,8 +9,9 @@ RUN cargo install --locked trunk@0.20.3 && \
 
 WORKDIR /app
 
-# Copy workspace files
+# Copy workspace files (need all members for workspace)
 COPY Cargo.toml Cargo.lock ./
+COPY backend ./backend
 COPY frontend ./frontend
 COPY middleware ./middleware
 
