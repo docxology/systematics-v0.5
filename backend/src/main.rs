@@ -13,7 +13,6 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 #[cfg(not(feature = "shuttle"))]
 use std::net::SocketAddr;
 
-#[cfg(feature = "shuttle")]
 use tower_http::services::{ServeDir, ServeFile};
 
 async fn graphql_handler(
@@ -59,11 +58,23 @@ fn build_api_router() -> Router {
 async fn main() {
     init_tracing();
 
-    let app = build_api_router();
+    // Build API routes
+    let api_router = build_api_router();
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
-    tracing::info!("GraphQL server running at http://{}/graphql", addr);
-    tracing::info!("GraphQL playground available at http://{}/graphql", addr);
+    // Serve static files from frontend/dist
+    // Fallback to index.html for SPA routing
+    let static_files = ServeDir::new("frontend/dist")
+        .not_found_service(ServeFile::new("frontend/dist/index.html"));
+
+    // Combine routes: API takes precedence, then static files
+    let app = Router::new()
+        .nest("/", api_router)
+        .fallback_service(static_files);
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    tracing::info!("GraphQL API configured at /graphql");
+    tracing::info!("Static files served from frontend/dist");
+    tracing::info!("Server running at http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
