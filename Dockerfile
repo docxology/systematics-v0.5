@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1
+
 # Build stage for frontend
 FROM rust:1.83-bookworm AS frontend-builder
 
@@ -26,9 +28,6 @@ COPY Cargo.toml Cargo.lock ./
 COPY backend ./backend
 COPY middleware ./middleware
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-
 # Build backend in release mode
 WORKDIR /app/backend
 RUN cargo build --release
@@ -47,7 +46,7 @@ WORKDIR /app
 COPY --from=backend-builder /app/target/release/systematics-backend /app/systematics-backend
 
 # Copy frontend dist
-COPY --from=backend-builder /app/frontend/dist /app/frontend/dist
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
 # Expose port
 EXPOSE 8000
