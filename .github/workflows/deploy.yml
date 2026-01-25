@@ -1,103 +1,23 @@
-name: Deploy to Shuttle
+name: Deploy to Fly.io
 
 on:
   push:
     branches: [main]
   workflow_dispatch:  # Allow manual deployment
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   deploy:
-    name: Deploy to Shuttle
+    name: Deploy to Fly.io
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Install wasm32 target
-        run: rustup target add wasm32-unknown-unknown
-
-      - name: Install Trunk
-        run: |
-          wget -qO- https://github.com/trunk-rs/trunk/releases/download/v0.20.3/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
-          sudo mv trunk /usr/local/bin/
-
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      # Create dummy wasm-opt in Trunk cache to bypass optimization
-      - name: Create dummy wasm-opt in Trunk cache to bypass optimization
-        run: |
-          # Trunk downloads wasm-opt to ~/.cache/trunk/wasm-opt-version_116/bin/
-          # Pre-create a dummy version so Trunk uses it instead of downloading
-          mkdir -p ~/.cache/trunk/wasm-opt-version_116/bin
-          cat > ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt << 'EOF'
-          #!/bin/bash
-          # Dummy wasm-opt that just copies input to output (bypasses optimization)
-          # This works around incompatibility between Rust 1.93.0 and wasm-opt v116
-          if [[ "$*" =~ --output=([^[:space:]]+) ]]; then
-            output="${BASH_REMATCH[1]}"
-          elif [[ "$2" == "--output" ]]; then
-            output="$3"
-          else
-            for ((i=1; i<=$#; i++)); do
-              if [[ "${!i}" == "--output" ]]; then
-                j=$((i+1))
-                output="${!j}"
-                break
-              fi
-            done
-          fi
-          # Find the input file (last argument)
-          input="${@: -1}"
-          if [ -n "$output" ] && [ -f "$input" ]; then
-            cp "$input" "$output"
-            exit 0
-          fi
-          exit 0
-          EOF
-          chmod +x ~/.cache/trunk/wasm-opt-version_116/bin/wasm-opt
-
-      # CRITICAL: Build frontend BEFORE deploying backend
-      - name: Build frontend with Trunk
-        working-directory: frontend
-        run: trunk build --release
-
-      # Verify frontend build succeeded
-      - name: Verify frontend dist exists
-        run: |
-          if [ ! -d "frontend/dist" ]; then
-            echo "ERROR: frontend/dist not found!"
-            exit 1
-          fi
-          ls -la frontend/dist/
-
-      # Install Shuttle CLI using cargo-binstall for speed
-      - name: Install cargo-binstall
-        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-
-      - name: Install Shuttle CLI
-        run: cargo binstall -y cargo-shuttle@0.52.0
-
-      # Deploy to Shuttle using CLI directly (bypass action for initial setup)
-      - name: Deploy to Shuttle
-        working-directory: backend
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
         env:
-          SHUTTLE_API_KEY: ${{ secrets.SHUTTLE_API_KEY }}
-        run: |
-          # Use shuttle CLI directly for first-time deployment
-          # The shuttle deploy command will create the project if it doesn't exist
-          shuttle deploy --name systematics-v05 --allow-dirty
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
