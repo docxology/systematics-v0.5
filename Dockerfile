@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Build stage for frontend
-FROM rust:1.83-bookworm AS frontend-builder
+FROM rust:1.84-bookworm AS frontend-builder
 
 # Install Trunk and wasm32 target
 RUN cargo install --locked trunk@0.20.3 && \
@@ -20,7 +20,7 @@ WORKDIR /app/frontend
 RUN trunk build --release
 
 # Build stage for backend
-FROM rust:1.83-bookworm AS backend-builder
+FROM rust:1.84-bookworm AS backend-builder
 
 WORKDIR /app
 
