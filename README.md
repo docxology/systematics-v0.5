@@ -36,10 +36,9 @@ The ability to add vocabulary and grammars in such a consistent way opens up man
 With regards to the category theoretic elements, with our bootstrapping structures in place as well as some initial well defined schemas, we can start looking at processes such as the morphisms between elements internal to a categroy, the functors between categories, or the homotopy types within and across categroies that articulate a sort of state model or hilbert space (note that each system is itself a kind of homotopy type).
 
 For example we can examine the cross category equivelence mappings between index 1, coordinate 1 and term 1, which I believe is called the functorial semantics. Or we could look at morphism types between nodes in a given category such as isomorphisms, endomorphisms, homomorphisms and so on. We can look at linear transformations such as the fibrations illustrated below where the category of sub-animate existence ‘fibrates’ into a tetrad consisting of sub categories like ‘universal field/radiation, elemental complexes, molocular structures, soil and ocean’, and the same for animate and super animate levels of existence. Or we can work out the non-linear transforms between systems such as from a monad of humanity > dyad of man/woman > the triad of father/mother/child. (Note to self this is possibly a sort of qualative fourrier transform).
- 
+
 ![Three Groupings of Being](images/3GroupsOfBeing.png)
 ![12levelsofbeing](images/12LevelsOfBeing.png)
-
 
 Building this prototype so that it is self consistent and ultimately correct by construction has already presented many challenges and bootstrapping issues, but horizon one has taken shape far enough to work on the API some more while adding new features.
 Horizon omega
@@ -60,8 +59,8 @@ We shall have to see what becomes.
 
 This repository is organized as a Rust workspace with three independent modules:
 
-```
-philadelphia/
+```text
+systematics-v0.5/
 ├── backend/          # Axum GraphQL server (domain logic + API)
 ├── middleware/       # Shared types and GraphQL schema
 ├── frontend/         # Yew/WASM web interface
@@ -71,42 +70,88 @@ philadelphia/
 ### Module Overview
 
 **backend/** - The GraphQL API server built with Axum and async-graphql. Contains:
+
 - Core domain logic (`core/`) - entries, links, graphs, language processing
 - Data construction (`data/`) - system definitions from orders 1-12
 - GraphQL resolvers (`graphql/`)
 
 **middleware/** - Shared contract between frontend and backend. Contains:
+
 - Wire format types with feature-gated derives (serde for all, async-graphql for server)
 - GraphQL schema definition
 
 **frontend/** - Rust/WASM single-page application built with Yew. Contains:
+
 - GraphQL client for API communication
 - SVG graph renderer
 - System selector component
 
-### Prerequisites
-
-- Rust 1.75+ (tested with 1.87.0)
-- [Trunk](https://trunkrs.dev/) for frontend builds: `cargo install trunk`
-- wasm32 target: `rustup target add wasm32-unknown-unknown`
-
-### Building
+### Quick Start
 
 ```bash
-# Build all modules
-cargo build --workspace
+# 1. Setup environment (installs Rust, wasm32 target, Trunk)
+./setup.sh
 
-# Build release
-cargo build --workspace --release
+# 2. Run tests to verify installation
+./run.sh test
+
+# 3. Start development servers
+./run.sh dev
+# → Backend at http://127.0.0.1:8000/graphql
+# → Frontend at http://127.0.0.1:8080
 ```
 
-### Running
+### Prerequisites
+
+All prerequisites are automatically installed by `./setup.sh`:
+
+- Rust 1.75+ with stable toolchain
+- wasm32-unknown-unknown target
+- [Trunk](https://trunkrs.dev/) for WASM builds
+- [uv](https://astral.sh/uv) (optional, for Python tooling)
+
+### Orchestrator Commands
+
+The `run.sh` script provides a unified CLI:
+
+```bash
+./run.sh build          # Build all workspace members (debug)
+./run.sh build-release  # Build for production
+./run.sh test           # Run all 32 tests
+./run.sh dev            # Start backend + frontend servers
+./run.sh backend        # Start backend only
+./run.sh frontend       # Start frontend only
+./run.sh fmt            # Format all code
+./run.sh lint           # Run clippy linter
+./run.sh deploy-fly     # Deploy to Fly.io
+./run.sh help           # Show all commands
+```
+
+### Manual Setup
+
+If you prefer manual setup:
+
+```bash
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Add wasm32 target
+rustup target add wasm32-unknown-unknown
+
+# Install Trunk
+cargo install trunk
+
+# Build and test
+cargo build --workspace
+cargo test --workspace --all-features
+```
+
+### Running Manually
 
 ```bash
 # Terminal 1: Start the backend server
 cd backend && cargo run
 # → GraphQL API at http://127.0.0.1:8000/graphql
-# → GraphQL Playground at http://127.0.0.1:8000/graphql
 
 # Terminal 2: Start the frontend dev server
 cd frontend && trunk serve
@@ -116,7 +161,21 @@ cd frontend && trunk serve
 ### Architecture Notes
 
 The middleware module uses Cargo features to provide appropriate derives:
+
 - Backend imports with `features = ["server"]` → gets `async-graphql` derives
 - Frontend imports without that feature → gets just `serde` derives
 
 This ensures a single source of truth for all API types while keeping dependencies minimal for WASM builds.
+
+### Testing
+
+The project includes 32 automated tests covering:
+
+- Core domain types (entries, links, graphs)
+- Language/vocabulary handling
+- Data construction for orders 1-12
+
+```bash
+./run.sh test           # Run all tests
+./run.sh test-verbose   # Run with output
+```
